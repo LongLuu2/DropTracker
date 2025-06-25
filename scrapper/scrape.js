@@ -27,11 +27,9 @@ function delay(ms) {
 
   await delay(3000); // Let the page hydrate
 
- // Scroll a little to trigger layout render
+  // Scroll a bit to trigger layout render
   await page.evaluate(() => window.scrollBy(0, 300));
-
-  // Wait again to ensure rendering
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await delay(2000);
 
   // Coordinates to click the first post (adjust if needed)
   const clickX = 300;
@@ -41,26 +39,46 @@ function delay(ms) {
   await page.mouse.click(clickX, clickY);
   console.log(`✅ Clicked at (${clickX}, ${clickY})`);
 
-  // Wait to see modal
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  // Wait for modal
+  await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
 
-  // Wait for post modal to appear
-  try {
-    await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
+  const results = [];
+  let postCount = 0;
 
-    const postData = await page.evaluate(() => {
-      const img = document.querySelector('div[role="dialog"] img');
-      const caption = document.querySelector('div[role="dialog"] ul li div._a9zr');
-      return {
-        image: img?.src || null,
-        caption: caption?.innerText || ''
-      };
-    });
+  while (postCount < 5) {
+    try {
+      await delay(2000); // Let post load
 
-    console.log('✅ Scraped:', postData);
-  } catch (err) {
-    console.log('❌ Failed to extract post:', err.message);
+      const postData = await page.evaluate(() => {
+        const img = document.querySelector('div[role="dialog"] img');
+        const captionSpan = Array.from(document.querySelectorAll('div[role="dialog"] ul li div._a9zr'))
+          .find(el => !el.closest('header'));
+        return {
+          image: img?.src || null,
+          caption: captionSpan?.innerText || ''
+        };
+      });
+
+      console.log(`✅ Post ${postCount + 1}:`, postData);
+      results.push(postData);
+      postCount++;
+
+      // Click next button if available
+      const nextButton = await page.$('div[role="dialog"] svg[aria-label="Next"]');
+      if (nextButton && postCount < 5) {
+        await nextButton.click();
+      } else {
+        break;
+      }
+    } catch (err) {
+      console.log('❌ Error scraping post:', err.message);
+      break;
+    }
   }
+
+  // Save results
+  fs.writeFileSync('posts.json', JSON.stringify(results, null, 2));
+  console.log('💾 Saved results to posts.json');
 
   await browser.close();
 })();
