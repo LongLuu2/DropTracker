@@ -5,23 +5,12 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-(async () => {
-  const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: {
-      width: 1280,
-      height: 800
-    }
-  });
+const results = []
 
-  const page = await browser.newPage();
-
-  // Load cookies
-  const cookies = JSON.parse(fs.readFileSync('cookies.json', 'utf8'));
-  await page.setCookie(...cookies);
-
+async function scraper (page, user)  {
+  
   // Go to profile page
-  await page.goto('https://www.instagram.com/luckycat.sply/', {
+  await page.goto(`https://www.instagram.com/${user}/`, {
     waitUntil: 'networkidle2'
   });
 
@@ -43,12 +32,11 @@ function delay(ms) {
   }
   // Click the first post
   await postContainers[0].click();
-  console.log('✅ Clicked first post.');
+  console.log('post clicked');
 
   // Wait for modal
   await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
 
-  const results = [];
   let postCount = 0;
 
   while (postCount < 5) {
@@ -82,9 +70,31 @@ function delay(ms) {
     }
   }
 
-  // Save results
-  fs.writeFileSync('posts.json', JSON.stringify(results, null, 2));
-  console.log('saved to json');
+}
 
+(async () => {
+  const browser = await puppeteer.launch({
+    headless: false,
+    defaultViewport: {
+      width: 1280,
+      height: 800
+    }
+  });
+
+  const page = await browser.newPage();
+
+  // Load cookies
+  const cookies = JSON.parse(fs.readFileSync('cookies.json', 'utf8'));
+  await page.setCookie(...cookies);
+
+  
+  const usernames = fs.readFileSync('IGaccounts.txt', 'utf8').split('\n').map(u => u.trim()).filter(Boolean);
+
+  for (const user of usernames) {
+    await scraper(page, user);
+  }
+
+  // currently export to json
+  fs.writeFileSync('posts.json', JSON.stringify(results, null, 2));
   await browser.close();
 })();
