@@ -31,13 +31,19 @@ function delay(ms) {
   await page.evaluate(() => window.scrollBy(0, 300));
   await delay(2000);
 
-  // Coordinates to click the first post (adjust if needed)
-  const clickX = 300;
-  const clickY = 500;
+  // Wait for post containers to load
+  await page.waitForSelector('div._aagw', { timeout: 20000 });
+  const postContainers = await page.$$('div._aagw');
 
-  await page.mouse.move(clickX, clickY);
-  await page.mouse.click(clickX, clickY);
-  console.log(`✅ Clicked at (${clickX}, ${clickY})`);
+  //check if containers are found
+  if (!postContainers.length) {
+  console.log('Not found');
+  await browser.close();
+  return;
+  }
+  // Click the first post
+  await postContainers[0].click();
+  console.log('✅ Clicked first post.');
 
   // Wait for modal
   await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
@@ -71,14 +77,14 @@ function delay(ms) {
         break;
       }
     } catch (err) {
-      console.log('❌ Error scraping post:', err.message);
+      console.log('Error while scraping:', err.message);
       break;
     }
   }
 
   // Save results
   fs.writeFileSync('posts.json', JSON.stringify(results, null, 2));
-  console.log('💾 Saved results to posts.json');
+  console.log('saved to json');
 
   await browser.close();
 })();
