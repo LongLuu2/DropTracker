@@ -3,17 +3,11 @@ const path = require('path');
 require('dotenv').config();
 const OpenAI = require('openai');
 
+
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY // Make sure it's set
+  apiKey: process.env.OPENAI_API_KEY 
 });
 
-// Only process these numeric IDs
-const TEST_IDS = ['39', '40'];
-
-function extractIdNumber(imgId) {
-  const match = imgId.match(/\d+/);
-  return match ? match[0] : null;
-}
 
 async function analyzePost(post) {
   const imagePath = path.join(__dirname, 'imgs', post.img_id);
@@ -34,32 +28,30 @@ async function analyzePost(post) {
             {
               type: 'text',
               text: `This is an Instagram post. Here's the caption:\n\n"${post.caption}"\n\n
-- For each item, make your best guess at the SKU based on the brand, model, and colorway.
-- Guess the item name using visible logos, color, and design.
-- After guessing the item name, generate a plausible SKU based on the name.
--If you generate a full product name (e.g., "Yeezy Boost 700 Carbon Blue"), try to return the correct SKU if known.
-If not, generate a plausible SKU in the brand's real-world style:
-- Adidas: FW2499, GY3438
-- Nike/Jordan: 555088-101, CT8532-105
-- New Balance: ML2002RA, U9060MAC
-- On Running: 46.99238, 61.98573
-Do not return "Not visible" — always guess something realistic.
-- If the name is specific enough, generate the most likely real-world SKU used by that brand for this product.
-- Use the price from the image. If not visible, use the caption.
-- Get the size and condition from caption if possible,.
-- Output only a JSON array with no extra text, markdown, or code blocks.
+You are extracting item data from an Instagram post image that shows product listings.
+Use the image primarily to extract product listings. If caption text is available, use it to double-check or fill in missing info
+If there is no price in the img or name in the img, ignore and respond with "in valid"
+For each item in the image:
+- Extract the full product name.
+- If the name contains a censored word (like **\***), guess and uncensor it.
+- Extract the size (can be multiple sizes).
+- Extract the item condition (e.g., BNIB, VNDS).
+- Extract the price in this format: "IDR 1.999.000".
+- give save the img exactly as ${post.img_id}
 
-Format:
+
+Then, format the result as a JSON array using this structure for each item:
 [
   {
-    "sku": "555088-101",
     "name": "Air Jordan 1 Retro High OG Chicago",
-    "confidence": "90%",
-	"size": ,
-	"condition": ,
-    "price": "IDR 1.699.000"
+    "size": "42",
+    "condition": "BNIB",
+    "price": "IDR 1.699.000",
+    "img": ${post.img_id}
   }
-]`,
+]
+  
+Return the results as a flat JSON array, not nested in another array.`,
             },
             {
               type: 'image_url',
@@ -75,11 +67,7 @@ Format:
 	const raw = response.choices[0].message.content.trim();	
 	const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/```$/, '').trim();
 
-    return {
-      img_id: post.img_id,
-      caption: post.caption,
-      analysis: JSON.parse(cleaned)
-    };
+    return JSON.parse(cleaned);
 
   } catch (err) {
     console.error(`❌ Error analyzing ${post.img_id}:`, err.message);
@@ -92,12 +80,10 @@ async function run() {
   const results = [];
 
   for (const post of posts) {
-    const idNum = extractIdNumber(post.img_id);
-    if (!TEST_IDS.includes(idNum)) continue;
 
     const result = await analyzePost(post);
     if (result) {
-      results.push(result);
+      results.push(...result);
     }
 
     await new Promise(resolve => setTimeout(resolve, 1000));

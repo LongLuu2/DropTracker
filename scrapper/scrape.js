@@ -1,5 +1,11 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const path = require('path');
+const fetch = require('node-fetch');
+
+const INPUT_FILE = 'posts.json';
+const OUTPUT_FILE = 'posts.json';
+const IMAGE_DIR = 'imgs';
 
 function delay(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -39,17 +45,18 @@ async function scraper (page, user)  {
 
 	let postCount = 0;
 
-	while (postCount < 6) {
+	while (postCount < 20) {
 		try {
 			await delay(2000); // Let post load
 
-			const postData = await page.evaluate(() => {
+			const postData = await page.evaluate(user => {
 				const img = document.querySelector('div[role="dialog"] img');
 				const captionSpan = Array.from(document.querySelectorAll('div[role="dialog"] ul li div._a9zr'))
 					.find(el => !el.closest('header'));
 				return {
 					link: img?.src || null,
 					caption: captionSpan?.innerText || '',
+					user: user,
 					img_id: null
 				};
 			});
@@ -60,7 +67,7 @@ async function scraper (page, user)  {
 
 			// Click next button if available
 			const nextButton = await page.$('div[role="dialog"] svg[aria-label="Next"]');
-			if (nextButton && postCount < 6) {
+			if (nextButton && postCount < 20) {
 				await nextButton.click();
 			} else {
 				break;
@@ -71,6 +78,50 @@ async function scraper (page, user)  {
 		}
 	}
 
+}
+// utils for downloads
+if (!fs.existsSync(IMAGE_DIR)) {
+	fs.mkdirSync(IMAGE_DIR);
+}
+	
+// Get the last number used in existing image filenames
+const existingFiles = fs.readdirSync(IMAGE_DIR)
+	.filter(file => file.endsWith('.jpg'))
+	.map(file => parseInt(file.match(/img_(\d+)\.jpg/)?.[1] || 0))
+	.filter(num => !isNaN(num));
+
+let startIndex = existingFiles.length ? Math.max(...existingFiles) + 1 : 1;
+
+async function downloadImage(url, filename) {
+	const res = await fetch(url);
+	if (!res.ok) throw new Error(`Failed to download: ${url}`);
+	const buffer = await res.buffer();
+	fs.writeFileSync(path.join(IMAGE_DIR, filename), buffer);
+}
+
+// function to download
+async function download () {
+	const posts = JSON.parse(fs.readFileSync(INPUT_FILE, 'utf8'));
+
+	for (let i = 0; i < posts.length; i++) {
+	const post = posts[i];
+	if (!post.link || post.img_id) continue; 
+
+	const filename = `img_${startIndex}.jpg`;
+
+	try {
+	  await downloadImage(post.link, filename);
+	  post.img_id = filename;
+	  console.log(`downloaded ${filename}`);
+	} catch (err) {
+	  console.log(`Failed at (index ${i}):`, err.message);
+	}
+
+	startIndex++;
+  }
+
+	fs.writeFileSync(OUTPUT_FILE, JSON.stringify(posts, null, 2));
+	console.log(`saved`);
 }
 
 (async () => {
@@ -97,5 +148,6 @@ async function scraper (page, user)  {
 
 	// currently export to json
 	fs.writeFileSync('posts.json', JSON.stringify(results, null, 2));
+	await download();
 	await browser.close();
 })();
