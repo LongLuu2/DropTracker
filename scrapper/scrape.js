@@ -38,7 +38,6 @@ async function scraper (page, user)  {
 	}
 	// Click the first post
 	await postContainers[0].click();
-	console.log('post clicked');
 
 	// Wait for modal
 	await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
@@ -49,19 +48,18 @@ async function scraper (page, user)  {
 		try {
 			await delay(2000); // Let post load
 
-			const postData = await page.evaluate(user => {
+			const postData = await page.evaluate((user) => {
 				const img = document.querySelector('div[role="dialog"] img');
 				const captionSpan = Array.from(document.querySelectorAll('div[role="dialog"] ul li div._a9zr'))
 					.find(el => !el.closest('header'));
 				return {
 					link: img?.src || null,
 					caption: captionSpan?.innerText || '',
-					user: user,
+					acc: user,
 					img_id: null
 				};
-			});
+			}, user);
 
-			console.log(`✅ Post ${postCount + 1}:`, postData);
 			results.push(postData);
 			postCount++;
 
@@ -77,7 +75,6 @@ async function scraper (page, user)  {
 			break;
 		}
 	}
-
 }
 // utils for downloads
 if (!fs.existsSync(IMAGE_DIR)) {
@@ -112,7 +109,6 @@ async function download () {
 	try {
 	  await downloadImage(post.link, filename);
 	  post.img_id = filename;
-	  console.log(`downloaded ${filename}`);
 	} catch (err) {
 	  console.log(`Failed at (index ${i}):`, err.message);
 	}
@@ -121,12 +117,11 @@ async function download () {
   }
 
 	fs.writeFileSync(OUTPUT_FILE, JSON.stringify(posts, null, 2));
-	console.log(`saved`);
 }
 
 (async () => {
 	const browser = await puppeteer.launch({
-		headless: false,
+		headless: true,
 		defaultViewport: {
 			width: 1280,
 			height: 800
@@ -134,8 +129,7 @@ async function download () {
 	});
 
 	const page = await browser.newPage();
-
-	// Load cookies
+	// Load cookies from save
 	const cookies = JSON.parse(fs.readFileSync('cookies.json', 'utf8'));
 	await page.setCookie(...cookies);
 

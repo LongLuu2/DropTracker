@@ -38,6 +38,7 @@ For each item in the image:
 - Extract the item condition (e.g., BNIB, VNDS).
 - Extract the price in this format: "IDR 1.999.000".
 - give save the img exactly as ${post.img_id}
+-save the acc exactly as ${post.acc}
 
 
 Then, format the result as a JSON array using this structure for each item:
@@ -47,6 +48,7 @@ Then, format the result as a JSON array using this structure for each item:
     "size": "42",
     "condition": "BNIB",
     "price": "IDR 1.699.000",
+    "acc": ${post.acc},
     "img": ${post.img_id}
   }
 ]
@@ -90,7 +92,6 @@ async function run() {
   }
 
   fs.writeFileSync('results.json', JSON.stringify(results, null, 2));
-  console.log('✅ Saved selected results to results.json');
 }
 
 run();
