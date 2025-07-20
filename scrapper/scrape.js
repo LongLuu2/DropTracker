@@ -119,7 +119,7 @@ async function download () {
 	fs.writeFileSync(OUTPUT_FILE, JSON.stringify(posts, null, 2));
 }
 
-(async () => {
+async function scrape ()  {
 	const browser = await puppeteer.launch({
 		headless: true,
 		defaultViewport: {
@@ -144,4 +144,5 @@ async function download () {
 	fs.writeFileSync('posts.json', JSON.stringify(results, null, 2));
 	await download();
 	await browser.close();
-})();
+};
+scrape();
