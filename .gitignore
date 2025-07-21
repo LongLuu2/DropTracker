@@ -1,3 +1,13 @@
-scrapper/node_modules/
+node_modules/
+posts.json
+test.js
+cookies.json
+IGaccounts.txt
+.gitignore
 info.txt
-
+imgs/
+.env
+results.json
+frontend
+scrapedAcc.txt
+IgAccQ.txt

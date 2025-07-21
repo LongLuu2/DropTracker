@@ -134,10 +134,16 @@ async function scrape ()  {
 	await page.setCookie(...cookies);
 
 	
-	const usernames = fs.readFileSync('IGaccounts.txt', 'utf8').split('\n').map(u => u.trim()).filter(Boolean);
+	let usernames = fs.readFileSync(usernamesPath, 'utf8')
+	.split('\n')
+	.map(u => u.trim())
+	.filter(Boolean);
 
-	for (const user of usernames) {
+	for (const user of [...usernames]) {
 		await scraper(page, user);
+		usernames = usernames.filter(u => u !== user);
+		fs.writeFileSync(usernamesPath, usernames.join('\n'));
+		fs.appendFileSync("scrapedAcc.txt", `${user}\n`)
 	}
 
 	// currently export to json
