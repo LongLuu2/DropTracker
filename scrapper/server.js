@@ -19,23 +19,32 @@ app.post("/api/scrape", async (req, res) => {
         console.error(err);
         res.status(500).json({ error: "scrape failed"});
     }
-})
+});
 
 // add a user to instagram to scrape
-app.post("/api/addInsta", (req, res) => {
-    const user = req.body.username;
-    if(!username) {
-        return res.status(400).json({error: "No name entered"});
+app.post("/api/addInsta/:username", async (req, res) => {
+    const username = req.params.username;
+
+    if (!username) {
+        return res.status(400).json({ error: "No username provided" });
     }
-    fs.appendFile(path.join(__dirname, "IGaccounts.txt"), `${user}\n`, (err) => {
-        if (err) {
-            console.error(err);
-            res.status(500).json({error: "something wrong in file"});
-        } else {
-            res.status(200).send("Successfully added")
+    try {
+        const filePath = path.join(__dirname, "IgAccQ.txt");
+
+        let currentQ = [];
+        const fileData = await fs.readFile(filePath, "utf8");
+        currentQ = fileData.split("\n").map(u => u.trim()).filter(Boolean);
+        if (currentQ.includes(username)) {
+            return res.status(409).json({ error: "Username already exists" });
         }
-    })
-})
+        fs.appendFile(filePath, `${username}\n`);
+        res.status(200).json({ message: "user add to be scraped"})
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({error: "something went wrong with file"})
+    }
+});
+
 // get the json file containing data on other sellers
 app.get("/api/otherSeller", async (req, res) => {
     try {
@@ -63,14 +72,21 @@ app.get("/api/scrapedAccs", async (req, res) => {
 });
 
 // remove user from the q 
-app.delete("/api/results/:username", async (req, res) => {
+app.delete("/api/removeDB/:username", async (req, res) => {
   const username = req.params.username;
 
   try {
     const filePath = path.join(__dirname, 'results.json');
     const raw = await fs.readFile(filePath, 'utf8');
     const data = JSON.parse(raw);
-
+    const accPath = path.join(__dirname, 'scrapedAcc.txt');
+    const accRaw = await fs.readFile(accPath, 'utf8');
+    const updatedAccs = accRaw
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line && line !== username);
+    
+    await fs.writeFile(accPath, updatedAccs.join('\n'));
     const updated = data.filter(entry => entry.acc !== username);
     await fs.writeFile(filePath, JSON.stringify(updated, null, 2));
 
@@ -82,9 +98,9 @@ app.delete("/api/results/:username", async (req, res) => {
 });
 
 // delete user from the q
-app.delete("/api/queue/:username", async (req, res) => {
+app.delete("/api/removeQ/:username", async (req, res) => {
   const username = req.params.username;
-
+    console.log(username);
   try {
     const filePath = path.join(__dirname, 'IgAccQ.txt');
     const lines = (await fs.readFile(filePath, 'utf8'))

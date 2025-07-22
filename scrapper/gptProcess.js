@@ -77,7 +77,7 @@ Return the results as a flat JSON array, not nested in another array.`,
   }
 }
 
-async function run() {
+async function Aiprocess() {
   const posts = JSON.parse(fs.readFileSync('posts.json', 'utf8'));
   const results = [];
 
@@ -91,7 +91,19 @@ async function run() {
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
-  fs.writeFileSync('results.json', JSON.stringify(results, null, 2));
+  // appending all the data to results.json
+  const filePath = path.join(__dirname, 'results.json');
+  let existing = [];
+  if (fs.existsSync(filePath)) {
+  const raw = fs.readFileSync(filePath, 'utf8');
+  try {
+    existing = JSON.parse(raw);
+  } catch (e) {
+    console.error('Invalid JSON format in results.json');
+    }
+  }
+  existing.push(...results);
+  fs.writeFileSync(filePath, JSON.stringify(existing, null, 2));
 }
 
-run();
+module.exports = Aiprocess;

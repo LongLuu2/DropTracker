@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
-
+const Aiprocess = require('./gptProcess.js')
 const INPUT_FILE = 'posts.json';
 const OUTPUT_FILE = 'posts.json';
 const IMAGE_DIR = 'imgs';
@@ -132,7 +132,7 @@ async function scrape ()  {
 	// Load cookies from save
 	const cookies = JSON.parse(fs.readFileSync('cookies.json', 'utf8'));
 	await page.setCookie(...cookies);
-
+	const usernamesPath = "IgAccQ.txt"
 	
 	let usernames = fs.readFileSync(usernamesPath, 'utf8')
 	.split('\n')
@@ -150,5 +150,6 @@ async function scrape ()  {
 	fs.writeFileSync('posts.json', JSON.stringify(results, null, 2));
 	await download();
 	await browser.close();
+	await Aiprocess();
 };
-scrape();
+module.exports = scrape;
