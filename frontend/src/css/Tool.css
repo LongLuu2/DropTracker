@@ -1,0 +1,35 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.top{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: flex-start;
+
+}
+
+.sideBar{
+    width: 40%;
+    background-color: bisque;
+}
+
+.sideBar button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    border-radius: 6px;
+}
+
+.sideBar button:hover {
+    background-color: burlywood;
+}
