@@ -1,0 +1,43 @@
+.catalog-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  width: 100%; /* ✅ make sure it expands to the available width */
+  
+}
+
+.catalog-search {
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.catalog-grid {
+  flex-grow: 1;
+  overflow-y: auto;
+  width: 100%; /* ✅ prevent unexpected shrink */
+  display: grid;
+  gap: 1rem;
+}
+
+.catalog-card {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+
+.catalog-image {
+  width: 100px;
+  margin-top: 0.5rem;
+  border-radius: 4px;
+}
+.catalog-header {
+  flex-shrink: 0; /* Prevent shrinking */
+}

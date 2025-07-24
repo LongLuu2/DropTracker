@@ -1,0 +1,13 @@
+.instagramer-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.instagramer-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  width: 100%; 
+}
