@@ -71,6 +71,19 @@ app.get("/api/scrapedAccs", async (req, res) => {
     }
 });
 
+app.get('/api/getImg/:imgID', async (req, res) => {
+
+  try {
+    const imgID = req.params.imgID;
+    const imgPath = path.join(__dirname, '/imgs', imgID);
+    await fs.access(imgPath);
+    res.sendFile(imgPath)
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "something wrong with file system"});
+  }
+})
+
 // remove user from the q 
 app.delete("/api/removeDB/:username", async (req, res) => {
   const username = req.params.username;

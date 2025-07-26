@@ -5,7 +5,7 @@
   padding: 1rem;
   box-sizing: border-box;
   overflow: hidden;
-  width: 100%; /* ✅ make sure it expands to the available width */
+  width: 50%; 
   
 }
 
@@ -21,7 +21,7 @@
 .catalog-grid {
   flex-grow: 1;
   overflow-y: auto;
-  width: 100%; /* ✅ prevent unexpected shrink */
+  width: 100%; 
   display: grid;
   gap: 1rem;
 }
@@ -31,13 +31,64 @@
   padding: 1rem;
   border-radius: 6px;
   background: #f9f9f9;
+  display: flex;
+  align-items: center;
 }
 
-.catalog-image {
-  width: 100px;
-  margin-top: 0.5rem;
-  border-radius: 4px;
-}
+
 .catalog-header {
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0; 
+}
+
+.thumbnail {
+  width: 100px;
+  height: auto;
+  max-height: 100px;
+  cursor: pointer;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.catalog-text {
+  flex: 1;
+  padding-right: 1rem;
+}
+
+.modal-content {
+  position: relative; 
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-image {
+  max-width: 100%;
+  max-height: 80vh;
+}
+.close-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: white;
+  border: none;
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  z-index: 1001;
 }
