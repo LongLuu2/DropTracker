@@ -3,6 +3,7 @@ const fs = require('fs').promises;
 const path = require("path");
 const cors = require("cors");
 const scrape = require("./scrape")
+const fsSync = require('fs'); 
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -84,29 +85,54 @@ app.get('/api/getImg/:imgID', async (req, res) => {
   }
 })
 
-// remove user from the q 
+app.get("/api/getQ", async (req, res) => {
+    try {
+        const filePath = path.join(__dirname, 'IgAccQ.txt');
+        const rawData = await fs.readFile(filePath, 'utf8');
+        const accounts = rawData
+            .split('\n')
+            .map(line => line.trim())
+            .filter(Boolean); // removes empty lines
+
+        res.json(accounts);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to read queue" });
+    }
+});
+
+// remove user from the db
 app.delete("/api/removeDB/:username", async (req, res) => {
   const username = req.params.username;
 
   try {
     const filePath = path.join(__dirname, 'results.json');
-    const raw = await fs.readFile(filePath, 'utf8');
-    const data = JSON.parse(raw);
     const accPath = path.join(__dirname, 'scrapedAcc.txt');
+    const imgDir = path.join(__dirname, 'imgs');
+
+    // Update scrapedAcc.txt
     const accRaw = await fs.readFile(accPath, 'utf8');
     const updatedAccs = accRaw
       .split('\n')
       .map(line => line.trim())
       .filter(line => line && line !== username);
-    
     await fs.writeFile(accPath, updatedAccs.join('\n'));
+
+    // Update results.json
+    const raw = await fs.readFile(filePath, 'utf8');
+    const data = JSON.parse(raw);
     const updated = data.filter(entry => entry.acc !== username);
     await fs.writeFile(filePath, JSON.stringify(updated, null, 2));
 
-    res.json({ message: `Removed all entries for '${username}' from results.` });
+    // Delete related images
+    const files = fsSync.readdirSync(imgDir);
+    const toDelete = files.filter(file => file.includes(username));
+    await Promise.all(toDelete.map(file => fs.unlink(path.join(imgDir, file))));
+
+    res.json({ message: `Removed all data and images for '${username}'.` });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to remove user from results.' });
+    res.status(500).json({ error: 'Failed to remove user from results and images.' });
   }
 });
 
