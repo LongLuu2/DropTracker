@@ -33,11 +33,11 @@ cd scrapper
 npm install 
 node server.js 
 
-### Start the Frontend:
+Start the Frontend:
 cd frontend
 npm install
 npm start
-
+```
 ## Future Plans
 
 - Admin panel on the dashboard to track and visualize sales and product performance
