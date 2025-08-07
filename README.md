@@ -26,14 +26,14 @@ Designed for internal use, it supports centralized inventory management and prep
 
 ---
 
-## Starting
-
+### Starting
+```bash
 Start the Backend:
-cd scrapper \n
-npm install \n
-node server.js \n
+cd scrapper 
+npm install 
+node server.js 
 
-Start the Frontend:
+### Start the Frontend:
 cd frontend
 npm install
 npm start
