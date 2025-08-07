@@ -38,7 +38,7 @@ cd frontend
 npm install
 npm start
 
-##Future Plans
+## Future Plans
 
 - Admin panel on the dashboard to track and visualize sales and product performance
 - Migrate from JSON to MongoDB or PostgreSQL for scalable, persistent storage
