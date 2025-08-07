@@ -29,9 +29,9 @@ Designed for internal use, it supports centralized inventory management and prep
 ## Starting
 
 Start the Backend:
-cd scrapper
-npm install
-node server.js
+cd scrapper \n
+npm install \n
+node server.js \n
 
 Start the Frontend:
 cd frontend
