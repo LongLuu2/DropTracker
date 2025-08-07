@@ -23,7 +23,6 @@ Designed for internal use, it supports centralized inventory management and prep
 
 - **Backend:** Node.js, Express.js, Puppeteer, REST API
 - **Frontend:** React, CSS Grid/Flexbox
-- **Deployment:** AWS EC2 (backend), S3 (optional image storage)
 
 ---
 
