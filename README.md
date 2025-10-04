@@ -11,7 +11,7 @@ Designed for internal use, it supports centralized inventory management and prep
 
 -  Scrapes product posts (image + caption) from Instagram accounts
 -  Processes and deduplicates data into structured JSON format
--  Tracks source account (`acc`), image ID, and caption for each item
+-  Tracks source account, image ID, and caption for each item
 -  RESTful API built with Node.js and Express to serve listing data and images
 - React frontend that fetches and displays posts in a responsive layout
 -  Dynamic product catalog with image previews, captions, and source info
