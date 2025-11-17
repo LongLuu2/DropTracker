@@ -25,14 +25,9 @@ Designed for internal use, it supports centralized inventory management and prep
 
 ---
 
-### Short Demo
+### Short Demo Video
 
-<iframe width="600" height="350" 
-        src="https://www.youtube.com/embed/6CWKqNsIYc8" 
-        frameborder="0" 
-        allowfullscreen>
-</iframe>
-
+https://youtu.be/6CWKqNsIYc8
 
 
 
