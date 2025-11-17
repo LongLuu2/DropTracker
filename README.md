@@ -5,6 +5,9 @@ processing, and display of product listings from Instagram. The tool collects pr
 Puppeteer, stores the data, and exposes it via a RESTful API consumed by a dynamic React frontend.
 Designed for internal use, it supports centralized inventory management and prepares for future mobile integration.
 
+### Short Demo Video
+
+https://youtu.be/6CWKqNsIYc8
 ---
 
 ## Features
@@ -23,11 +26,7 @@ Designed for internal use, it supports centralized inventory management and prep
 - **Backend:** Node.js, Express.js, Puppeteer, REST API
 - **Frontend:** React, CSS 
 
----
 
-### Short Demo Video
-
-https://youtu.be/6CWKqNsIYc8
 
 
 
