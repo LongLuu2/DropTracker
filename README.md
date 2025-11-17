@@ -21,22 +21,14 @@ Designed for internal use, it supports centralized inventory management and prep
 ## Tech Stack
 
 - **Backend:** Node.js, Express.js, Puppeteer, REST API
-- **Frontend:** React, CSS Grid/Flexbox
+- **Frontend:** React, CSS 
 
 ---
 
-### Starting
-```bash
-Start the Backend:
-cd scrapper 
-npm install 
-node server.js 
+### Short Demo
 
-Start the Frontend:
-cd frontend
-npm install
-npm start
-```
+<iframe width="600" height="350" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allowfullscreen></iframe>
+
 
 
 
